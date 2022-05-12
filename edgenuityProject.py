@@ -127,6 +127,7 @@ def moveToMiddle():
     width2 = width / 2
     length2 = length / 2
     pyautogui.moveTo(width2,length2)
+
 def match():
     matchingActivity = driver.find_element(By.XPATH, '//*[@id="matchingActivity"]')
     matchLeftColumn = driver.find_elements(By.CLASS_NAME, 'matchLeftColumn')
@@ -135,8 +136,6 @@ def match():
     
     #in the code the answer are there. Look in the matchMiddleColumn and from top to bottum analyze the place of each element. 
     #As you analzye the elements you would see that each box for the arrows to go is seperated by the line and they are correlated to each other.
-    
-    
     
 def volumeVideo():
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="frame_video_controls"]')))   
@@ -238,6 +237,7 @@ def iframeVideo():
         print("muted video")
         #secondsPlusSeconds()
         footNavRightDisabled()
+        
 ### overly compilcated finding the volume button because the volume button is blocked by another element issue ^^^^
 global validateLogin
 def validateLogin(username, password):
