@@ -39,7 +39,6 @@ quizletOptions.headless = True
 driver_path = 'chromedriver'
 def document_initialised(driver):
     return driver.execute_script("return initialised")
-
 def searchGoogle(query):
     for j in search(query, tld="co.in", num=10, stop=10, pause=1): 
         if "https://quizlet.com/" in j:
@@ -404,25 +403,30 @@ def RandomMultipleChoiceClicker():
     print("Lesson name is: ", lessonName)
     switchBackToIframe()
     ezLessons = ['Summary', 'Instruction', 'Warm-Up']
-    hardLessons = ['Quiz', 'Test', 'Assingment', 'Unit Test Review', 'Unit Test','Cumulative Exam Review','Cumulative Exam' ]
+    hardLessons = ['Quiz', 'Test', 'Assingment', 'Unit Test Review', 'Unit Test', 'Cumulative Exam Review', 'Cumulative Exam' ]
     if lessonName in ezLessons:
         #click randomly
         print("This is a ezlesson...")
-        acb = driver.find_elements(By.CLASS_NAME, 'answer-choice-button')
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'answer-choice-button')))
+        acb = driver.find_elements(By.CLASS_NAME, 'answer-choice-button').text
         print("There are ", len(acb), "options to choose from")
         try:
-            questions = innerText(pqb[0])
-            searchGoogle(questions)
+            random.randint(0, len(acb)).click()
+        except:
+            print("click didnt work")
+        try:
             print(acb[random.randint(len(acb))].click())
+            print("clicked")
         except:
             print(random.choice(acb).click())
+            print("clicked")
         finally:
             clickDone()
-            print("clicked done")
+            audioChecking()
+            multipleChoiceCheckAnswer()
     else:
         #search google and get correct answers
         i = "Check all that apply"
-        global pqb  
         for i in innerText(pqb):
             print("Searching google") #beta
             searchGoogle(i)
@@ -446,39 +450,12 @@ def oneChoiceClicker(question):
     print("found possible answers")
     innerTextDef = innerText(definition)
     innerTextAns = innerText(answer)
-
     acl = driver.find_elements(By.CLASS_NAME, 'answer-choice-label')
     innerText(acl) 
     if acl in innerTextDef or acl in innerTextAns:
         print("found the answer")
         acl.click() 
-"""
-def lessonChecker():
-    if WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'Practice_Question_Body'))):
-        lessonName = driver.find_element(By.XPATH, '//*[@id="activity-title"]').text
-        
-        if lessonName in ezLessons:
-            print('idk')
-            #click random answer
-        
-        if lessonName in hardLessons:
-            questions = driver.find_elements(By.CLASS_NAME, 'Practice_Question_Body')
-            for i in range(len(questions)):
-                if questions[i].text != '':
-                    if lastQuestion != questions[i].text:
-                        lastQuestion = questions[i].text
-                        findAnswer(questions[i].text)
-                        print("found answer")
-        if lessonName == "Project":
-            driver.close()
-            print("I cant do projects just yet, We are working on it!")
-    else:
-        switchToMainContent()
-        global frameRight
-        frameRight = driver.find_element(By.XPATH, 'FrameRight')
-        frameRight.click()
-        print("clicked right page")
-"""
+
 def audioChecking():
     global audioOff
     try:
@@ -492,37 +469,27 @@ def audioChecking():
         print("No audio is being played, go ahead and click an answer")
             
 
-def checkAnswer():
-    try:
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'done-start')))
-    except TimeoutException:
-        try:
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'done-retry')))
-        except TimeoutException:
-            try:
-                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'done-complete')))
-            except TimeoutException:
-                footNavRightDisabled()
-        else:
-            #figure out which answer choice is incorrect and correct. If its incorrect skip over it and choose another one
-            """get a list of all the elements"""
-            answers = driver.find_elements(By.CLASS_NAME, '')
-            for i in range(len(answers)):
-                if answers[i].text != '':
-                    if innerText(answers[i]) != lastAnswer:
-                        lastAnswer = innerText(answers[i])
-                        answers[i].click()
-                        print("clicked answer")
-                        break
-            correctAnswer = driver.find_element(By.CLASS_NAME, 'icon-qa-right2')
-            incorrectAnswer = driver.find_element(By.CLASS_NAME, 'icon-qa-wrong2')
+def multipleChoiceCheckAnswer():
+    if start.is_displayed():
+        start = driver.find_element(By.CLASS_NAME, 'done-start')
+        print("that wasnt supposed to happen")
+        clickDone()
+        time.sleep(1)
+    if retry.is_displayed():
+        retry = driver.find_element(By.CLASS_NAME, 'done-retry')
+        audioChecking()
+        time.sleep(1)
+        clickDone()
+        multipleChoiceCheckAnswer()
+    if complete.is_displayed():
+        complete = driver.find_element(By.CLASS_NAME, 'done-complete')
+        print("completed")
+        time.sleep(1)
+        footNavRightDisabled()
 
-    else:
-        print("Go ahead and check the answer")
-    doneStart = driver.find_element(By.CLASS_NAME, 'done-start')
-    if doneStart == True:
-        doneStart.click()
-        print("checking answer")# place holder
+def oneChoiceAnswerChecker():
+    correctAnswer = driver.find_element(By.CLASS_NAME, 'icon-qa-right2')
+    incorrectAnswer = driver.find_element(By.CLASS_NAME, 'icon-qa-wrong2')
 
 global innerText
 def innerText(element):
