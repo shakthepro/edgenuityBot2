@@ -401,16 +401,19 @@ def clickDone():
 def RandomMultipleChoiceClicker():
     switchToMainContent()
     lessonName = driver.find_element(By.XPATH, '//*[@id="activity-title"]').text
-    print(lessonName)
+    print("Lesson name is: ", lessonName)
     switchBackToIframe()
     ezLessons = ['Summary', 'Instruction', 'Warm-Up']
     hardLessons = ['Quiz', 'Test', 'Assingment', 'Unit Test Review', 'Unit Test','Cumulative Exam Review','Cumulative Exam' ]
     if lessonName in ezLessons:
         #click randomly
-        print("ezlesson...")
+        print("This is a ezlesson...")
         acb = driver.find_elements(By.CLASS_NAME, 'answer-choice-button')
+        print("There are ", len(acb), "options to choose from")
         try:
-            print(acb[random.randint(0,2)].click())
+            questions = innerText(pqb[0])
+            searchGoogle(questions)
+            print(acb[random.randint(len(acb))].click())
         except:
             print(random.choice(acb).click())
         finally:
@@ -421,7 +424,7 @@ def RandomMultipleChoiceClicker():
         i = "Check all that apply"
         global pqb  
         for i in innerText(pqb):
-            print(i)
+            print("Searching google") #beta
             searchGoogle(i)
             #after searching google go to the website and check for the "correct answer" (use the code on the computer)
 
@@ -448,27 +451,8 @@ def oneChoiceClicker(question):
     innerText(acl) 
     if acl in innerTextDef or acl in innerTextAns:
         print("found the answer")
-        acl[0].click()
-    
-def lessonChecker(element):
-    global ezLessons
-    global hardLessons
-    ezLessons = ['Summary', 'Instruction', 'Warm-Up']
-    hardLessons = ['Quiz', 'Test', 'Assingment', 'Unit Test Review', 'Unit Test','Cumulative Exam Review','Cumulative Exam' ]
-    if element in ezLessons:
-        print("ezlesson")
-        #use random to get the amount of options avaliable and click randomly
-        acb = driver.find_elements(By.CLASS_NAME, 'answer-choice-button')
-        try:
-            #check if it is a multiple choice
-            print(random.choice(acb).click())
-        finally:
-            clickDone()
-            print("clicked done")
-    else:
-        if element in hardLessons:
-            print("idk")
-
+        acl.click() 
+"""
 def lessonChecker():
     if WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'Practice_Question_Body'))):
         lessonName = driver.find_element(By.XPATH, '//*[@id="activity-title"]').text
@@ -494,7 +478,7 @@ def lessonChecker():
         frameRight = driver.find_element(By.XPATH, 'FrameRight')
         frameRight.click()
         print("clicked right page")
-
+"""
 def audioChecking():
     global audioOff
     try:
@@ -518,7 +502,7 @@ def checkAnswer():
             try:
                 WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'done-complete')))
             except TimeoutException:
-                print("Placeholder")
+                footNavRightDisabled()
         else:
             #figure out which answer choice is incorrect and correct. If its incorrect skip over it and choose another one
             """get a list of all the elements"""
@@ -537,6 +521,7 @@ def checkAnswer():
         print("Go ahead and check the answer")
     doneStart = driver.find_element(By.CLASS_NAME, 'done-start')
     if doneStart == True:
+        doneStart.click()
         print("checking answer")# place holder
 
 global innerText
@@ -577,6 +562,7 @@ def main():
                     questionContainer = driver.find_element(By.CLASS_NAME, 'QuestionContainer')
                     print("one choice question")
                     try:
+                        global pqb
                         pqb = questionContainer.find_elements(By.CLASS_NAME, 'Practice_Question_Body')
                         audioChecking()
                         innerText(pqb)
